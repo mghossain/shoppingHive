@@ -18,7 +18,10 @@ class BasketItemController extends Controller
     {
         $basketItems = $this->model->latest()->get()->groupBy('product_id');
 
-        return response($basketItems);
+        return response([
+            'data' => $basketItems,
+            'status' => 'success'
+        ]);
     }
     public function store()
     {

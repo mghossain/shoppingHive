@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('removed_items', function (Blueprint $table) {
+        Schema::create('item_stats', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id');
+            $table->integer('addedCount');
+            $table->integer('removedCount');
+            $table->integer('purchasedCount');
             $table->timestamps();
         });
     }

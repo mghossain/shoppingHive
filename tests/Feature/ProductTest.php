@@ -12,6 +12,21 @@ class ProductTest extends TestCase
     use WithFaker;
 
     /** @test */
+    public function all_products_can_be_viewed()
+    {
+        $this->withoutExceptionHandling();
+
+        $attributes = [
+                'name' => 'Pioneer DJ Mixer',
+                'price' => 699,
+        ];
+
+        $this->assertDatabaseHas('products', $attributes);
+
+        $this->get('/api/products')->assertSee($attributes);
+    }
+
+    /** @test */
     public function a_product_can_be_added_to_basket()
     {
         $this->withoutExceptionHandling();
@@ -43,5 +58,11 @@ class ProductTest extends TestCase
         $this->delete('/api/basket/'.$item['id'])->assertStatus(200);
 
         $this->assertDatabaseMissing('basket_items', $item);
+    }
+
+    /** @test */
+    public function a_product_can_be_removed_from_basket_and_added_to_removed_items()
+    {
+
     }
 }
