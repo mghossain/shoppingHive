@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('removed_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id');
-            $table->integer('count');
             $table->timestamps();
         });
     }
