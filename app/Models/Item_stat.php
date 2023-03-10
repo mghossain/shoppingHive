@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Removed_item extends Model
+class Item_stat extends Model
 {
-    use HasFactory;
+    protected $fillable = ['product_id', 'addedCount', 'removedCount', 'purchasedCount'];
 }

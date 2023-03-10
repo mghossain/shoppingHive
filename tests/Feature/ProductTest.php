@@ -60,9 +60,9 @@ class ProductTest extends TestCase
         $this->assertDatabaseMissing('basket_items', $item);
     }
 
-    /** @test */
-    public function a_product_can_be_removed_from_basket_and_added_to_removed_items()
-    {
-
-    }
+//    /** @test */
+//    public function a_product_can_be_removed_from_basket_and_added_to_removed_items()
+//    {
+//
+//    }
 }
