@@ -13,11 +13,13 @@ class ProductTest extends TestCase
     /** @test */
     public function a_product_can_be_added_to_basket()
     {
+//        $this->withoutExceptionHandling();
+
         $attributes = [
             'product_id' => $this->faker->numberBetween(1, 5)
         ];
 
-        $this->post('/product', $attributes);
+        $this->post('/basket', $attributes);
 
         $this->assertDatabaseHas('basket_items', $attributes);
     }
