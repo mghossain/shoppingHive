@@ -8,19 +8,21 @@ use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
-    use WithFaker, RefreshDatabase;
+    use WithFaker;
 
     /** @test */
     public function a_product_can_be_added_to_basket()
     {
-//        $this->withoutExceptionHandling();
+        $this->withoutExceptionHandling();
 
         $attributes = [
             'product_id' => $this->faker->numberBetween(1, 5)
         ];
 
-        $this->post('/basket', $attributes);
+        $this->post('/api/basket', $attributes);
 
         $this->assertDatabaseHas('basket_items', $attributes);
+
+        $this->get('/api/basket')->assertSee($attributes['product_id']);
     }
 }

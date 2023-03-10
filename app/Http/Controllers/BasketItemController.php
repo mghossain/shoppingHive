@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class BasketItemController extends Controller
 {
+    public function index()
+    {
+        $basketItems = Basket_item::get();
+
+        return response($basketItems);
+    }
     public function store()
     {
         $attributes = request()->validate([
