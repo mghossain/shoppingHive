@@ -16,7 +16,7 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = $this->model->latest()->get();
+        $products = $this->model->latest()->paginate();
 
         return response([
             'data' => $products,

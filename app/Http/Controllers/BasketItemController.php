@@ -18,7 +18,7 @@ class BasketItemController extends Controller
 
     public function index()
     {
-        $basketItems = $this->model->latest()->get()->groupBy('product_id');
+        $basketItems = $this->model->latest()->paginate();
 
         return response([
             'data' => $basketItems,
