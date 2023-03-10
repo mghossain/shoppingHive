@@ -31,7 +31,22 @@ class BasketItemController extends Controller
            'product_id' => 'required'
         ]);
 
-        $basketItem = $this->model->create($attributes);
+        DB::beginTransaction();
+
+        try {
+            $basketItem = $this->model->create($attributes);
+
+            $Item_stat = $this->firstOrNewAndCheckForNullValues($basketItem['product_id']);
+
+            $Item_stat->addedCount += 1;
+
+            $Item_stat->save();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
 
         return response([
             'data' => $basketItem,
@@ -46,15 +61,7 @@ class BasketItemController extends Controller
         try {
             $basket->delete();
 
-            $Item_stat = Item_stat::firstOrNew([
-                'product_id' => $basket['product_id']
-            ]);
-            if ($Item_stat->addedCount == null)
-                $Item_stat->addedCount = 0;
-            if ($Item_stat->purchasedCount == null)
-                $Item_stat->purchasedCount = 0;
-            if ($Item_stat->removedCount == null)
-                $Item_stat->removedCount = 0;
+            $Item_stat = $this->firstOrNewAndCheckForNullValues($basket['product_id']);
 
             if (request('stat_type') == 'checkout')
                     $Item_stat->purchasedCount += 1;
@@ -73,5 +80,23 @@ class BasketItemController extends Controller
             'data' => $basket,
             'status' => 'success'
         ]);
+    }
+
+    /**
+     * @param $product_id
+     * @return mixed
+     */
+    public function firstOrNewAndCheckForNullValues($product_id)
+    {
+        $Item_stat = Item_stat::firstOrNew([
+            'product_id' => $product_id
+        ]);
+        if ($Item_stat->addedCount == null)
+            $Item_stat->addedCount = 0;
+        if ($Item_stat->purchasedCount == null)
+            $Item_stat->purchasedCount = 0;
+        if ($Item_stat->removedCount == null)
+            $Item_stat->removedCount = 0;
+        return $Item_stat;
     }
 }
