@@ -38,9 +38,10 @@ class ProductTest extends TestCase
 
         $this->post('/api/basket', $attributes)->assertStatus(200);
 
-        $item = Basket_item::latest()->first();
+        $item = Basket_item::latest()->first()->toArray();
 
         $this->delete('/api/basket/'.$item['id'])->assertStatus(200);
 
+        $this->assertDatabaseMissing('basket_items', $item);
     }
 }
