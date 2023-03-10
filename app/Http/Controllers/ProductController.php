@@ -18,9 +18,12 @@ class ProductController extends Controller
     {
         $products = $this->model->latest()->paginate();
 
-        return response([
-            'data' => $products,
-            'status' => 'success'
-        ]);
+        if ($products != null)
+            return response([
+                'data' => $products,
+                'status' => 'success'
+            ]);
+        else
+            return response(['error' => 'Unauthorized'], 400);
     }
 }

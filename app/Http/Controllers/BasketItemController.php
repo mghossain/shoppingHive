@@ -20,10 +20,13 @@ class BasketItemController extends Controller
     {
         $basketItems = $this->model->latest()->paginate();
 
-        return response([
-            'data' => $basketItems,
-            'status' => 'success'
-        ]);
+        if ($basketItems != null)
+            return response([
+                'data' => $basketItems,
+                'status' => 'success'
+            ]);
+        else
+            return response(['error' => 'Unauthorized'], 400);
     }
     public function store()
     {
@@ -45,7 +48,7 @@ class BasketItemController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            throw $e;
+            return response(['error' => 'Unauthorized'], 400);
         }
 
         return response([
@@ -73,7 +76,7 @@ class BasketItemController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            throw $e;
+            return response(['error' => 'Unauthorized'], 400);
         }
 
         return response([
