@@ -34,6 +34,12 @@ class BasketItemController extends Controller
            'product_id' => 'required'
         ]);
 
+        if ($this->model->where('product_id', $attributes['product_id'] )->exists()) {
+            return response([
+                'status' => 'exists'
+            ]);
+        }
+
         DB::beginTransaction();
 
         try {
