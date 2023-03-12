@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+
+    public function basketItem()
+    {
+        return $this->hasMany('App\Models\Basket_item');
+    }
 }

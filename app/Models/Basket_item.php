@@ -9,4 +9,10 @@ class Basket_item extends Model
 {
     use HasFactory;
     protected $fillable = ['product_id'];
+    protected $with = ['product'];
+
+    public function product()
+    {
+        return $this->belongsTo('App\Models\Product');
+    }
 }
