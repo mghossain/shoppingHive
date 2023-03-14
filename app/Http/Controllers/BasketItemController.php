@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\BasketItemRepo;
 use App\Models\Basket_item;
-use App\Models\Item_stat;
-use App\Observers\BasketItemObserver;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use stdClass;
 
 class BasketItemController extends Controller
 {
-    private Basket_item $model;
+    private BasketItemRepo $basketItemRepo;
 
     public function __construct()
     {
-        $this->model = new Basket_item();
+        $this->basketItemRepo = new BasketItemRepo();
     }
 
     public function index()
     {
-        $basketItems = $this->model->latest()->paginate();
+        $basketItems = $this->basketItemRepo->getAllBasketItemsPaginated();
 
         if ($basketItems != null)
             return response([
@@ -38,14 +32,15 @@ class BasketItemController extends Controller
            'product_id' => 'required'
         ]);
 
-        if ($this->model->where('product_id', $attributes['product_id'] )->exists()) {
+
+        if ($this->basketItemRepo->isItemInBasket($attributes['product_id'])) {
             return response([
                 'status' => 'exists'
             ]);
         }
 
         try {
-            $basketItem = $this->model->create($attributes);
+            $basketItem = $this->basketItemRepo->createBasketItem($attributes);
         } catch (\Exception $e) {
             return response(['error' => 'Unauthorized'], 400);
         }
@@ -59,15 +54,13 @@ class BasketItemController extends Controller
     public function destroy()
     {
         $ids = request()->input('ids.*.id');
+        $model = new Basket_item();
 
         try {
-            if (is_array($ids))
-            {
-                $this->model->withoutEvents(function () use ($ids) {
-                    $this->model->destroy($ids);
-                });
-                $this->model->fireEvent('deleted');
-            }
+            $model->withoutEvents(function () use ($ids) {
+                $this->basketItemRepo->deleteBasketItems($ids);
+            });
+            $model->fireEvent('deleted');
         } catch (\Exception $e) {
                 return response(['error' => $e.'Unauthorized'], 400);
             }
