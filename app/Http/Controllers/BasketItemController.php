@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Basket_item;
 use App\Models\Item_stat;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class BasketItemController extends Controller
 {
@@ -65,15 +68,14 @@ class BasketItemController extends Controller
 
     public function destroy()
     {
-
-        $items = $this->model->whereIn('id', request('ids'))->get();
+        $ids = request('ids');
+        $items = $this->model->whereIn('id', $ids)->get();
+        $item_stats = [];
+        $currentTime = Carbon::now()->toDateTimeString();
 
         DB::beginTransaction();
-
-        foreach ($items as $item) {
-            try {
-                $item->delete();
-
+        try {
+            foreach ($items as $item) {
                 $Item_stat = $this->firstOrNewAndCheckForNullValues($item['product_id']);
 
                 if (request('stat_type') == 'checkout')
@@ -81,14 +83,25 @@ class BasketItemController extends Controller
                 else
                     $Item_stat->removedCount += 1;
 
-                $Item_stat->save();
+                $Item_stat = $Item_stat->toArray();
+                $Item_stat['created_at'] = $currentTime;
+                $Item_stat['updated_at'] = $currentTime;
+                Arr::forget($Item_stat, ['product']);
 
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollback();
-                return response(['error' => 'Unauthorized'], 400);
+                $item_stats[] = $Item_stat;
             }
-        }
+
+            Item_stat::upsert($item_stats, ['id']);
+
+            if (is_array($ids))
+            {
+                $this->model->destroy($ids);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+                DB::rollback();
+                return response(['error' => $e.'Unauthorized'], 400);
+            }
 
         return response([
             'data' => $items,
@@ -111,6 +124,7 @@ class BasketItemController extends Controller
             $Item_stat->purchasedCount = 0;
         if ($Item_stat->removedCount == null)
             $Item_stat->removedCount = 0;
+
         return $Item_stat;
     }
 }
