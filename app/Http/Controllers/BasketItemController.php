@@ -43,20 +43,9 @@ class BasketItemController extends Controller
             ]);
         }
 
-        DB::beginTransaction();
-
         try {
             $basketItem = $this->model->create($attributes);
-
-            $Item_stat = $this->firstOrNewAndCheckForNullValues($basketItem['product_id']);
-
-            $Item_stat->addedCount += 1;
-
-            $Item_stat->save();
-
-            DB::commit();
         } catch (\Exception $e) {
-            DB::rollback();
             return response(['error' => 'Unauthorized'], 400);
         }
 
