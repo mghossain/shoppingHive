@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Item_stat;
+use App\Repositories\ItemStatRepo;
 
 class ItemStatController extends Controller
 {
-    private Item_stat $model;
-
+    private ItemStatRepo $itemStatRepo;
     public function __construct()
     {
-        $this->model = new Item_stat();
+        $this->itemStatRepo = new ItemStatRepo();
     }
 
     public function index()
     {
-        $stats = $this->model->latest()->paginate();
+        $stats = $this->itemStatRepo->getAllItemStatsPaginated();
 
         if ($stats != null)
             return response([
