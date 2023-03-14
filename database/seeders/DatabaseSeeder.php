@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $currentTime = Carbon::now();
+        $currentTime = Carbon::now()->toDateTimeString();
 
         $products = [
             [

@@ -55,7 +55,7 @@ class BasketItemController extends Controller
     {
         $ids = request()->input('ids.*.id');
         $model = new Basket_item();
-
+//        dd($ids);
         try {
             $model->withoutEvents(function () use ($ids) {
                 $this->basketItemRepo->deleteBasketItems($ids);
