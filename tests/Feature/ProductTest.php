@@ -64,4 +64,22 @@ class ProductTest extends TestCase
 
         $this->assertDatabaseHas('item_stats', $attributes);
     }
+
+    /** @test */
+    public function all_stats_can_be_viewed()
+    {
+        $this->withoutExceptionHandling();
+
+        $attributes = [
+            'product_id' => 1,
+            'addedCount' => 35,
+            'removedCount' => 10,
+            'purchasedCount' => 6,
+        ];
+
+        $this->assertDatabaseHas('item_stats', $attributes);
+
+        $this->get('/api/sales/stats')->assertSee($attributes);
+    }
+
 }
