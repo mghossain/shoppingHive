@@ -63,30 +63,35 @@ class BasketItemController extends Controller
         ]);
     }
 
-    public function destroy(Basket_item $basket)
+    public function destroy()
     {
+
+        $items = $this->model->whereIn('id', request('ids'))->get();
+
         DB::beginTransaction();
 
-        try {
-            $basket->delete();
+        foreach ($items as $item) {
+            try {
+                $item->delete();
 
-            $Item_stat = $this->firstOrNewAndCheckForNullValues($basket['product_id']);
+                $Item_stat = $this->firstOrNewAndCheckForNullValues($item['product_id']);
 
-            if (request('stat_type') == 'checkout')
+                if (request('stat_type') == 'checkout')
                     $Item_stat->purchasedCount += 1;
-            else
+                else
                     $Item_stat->removedCount += 1;
 
-            $Item_stat->save();
+                $Item_stat->save();
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response(['error' => 'Unauthorized'], 400);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                return response(['error' => 'Unauthorized'], 400);
+            }
         }
 
         return response([
-            'data' => $basket,
+            'data' => $items,
             'status' => 'success'
         ]);
     }

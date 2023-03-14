@@ -15,7 +15,10 @@ use App\Http\Controllers\ProductController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::resource('/basket', BasketItemController::class);
+Route::get('/basket', [BasketItemController::class, 'index']);
+Route::post('/basket', [BasketItemController::class, 'store']);
+Route::delete('/basket', [BasketItemController::class, 'destroy']);
+
 
 Route::resource('/product', ProductController::class);
 

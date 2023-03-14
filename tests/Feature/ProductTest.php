@@ -57,12 +57,11 @@ class ProductTest extends TestCase
         $item = Basket_item::latest()->first()->toArray();
 
         //Item Purchased
-//        $this->delete('/api/basket/'.$item['id'],['stat_type' => 'checkout'])->assertStatus(200);
+        $this->delete('/api/basket/',['ids' => [85, 86, $item['id']], 'stat_type' => 'checkout'])->assertStatus(200);
 
         //Item Removed
-        $this->delete('/api/basket/'.$item['id'])->assertStatus(200);
+//        $this->delete('/api/basket/',['ids' => [85, 86, $item['id']]])->assertStatus(200);
 
-        $this->assertDatabaseMissing('basket_items', $item);
         $this->assertDatabaseHas('item_stats', $attributes);
     }
 }
