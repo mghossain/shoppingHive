@@ -29,5 +29,4 @@ class BasketItemRepo
     {
         $this->model->destroy($ids);
     }
-
 }

@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Repositories\ProductRepo;
 
 class ProductController extends Controller
 {
-    private Product $model;
+    private ProductRepo $productRepo;
 
     public function __construct()
     {
-        $this->model = new Product();
+        $this->productRepo = new ProductRepo();
     }
 
     public function index()
     {
-        $products = $this->model->latest()->paginate();
+        $products = $this->productRepo->getAllProductsPaginated();
 
         if ($products != null)
             return response([
