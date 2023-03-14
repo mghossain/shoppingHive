@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Basket_item;
 use App\Models\Item_stat;
+use App\Observers\BasketItemObserver;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -57,63 +58,23 @@ class BasketItemController extends Controller
 
     public function destroy()
     {
-        $ids = request('ids');
-        $items = $this->model->whereIn('id', $ids)->get();
-        $item_stats = [];
-        $currentTime = Carbon::now()->toDateTimeString();
+        $ids = request()->input('ids.*.id');
 
-        DB::beginTransaction();
         try {
-            foreach ($items as $item) {
-                $Item_stat = $this->firstOrNewAndCheckForNullValues($item['product_id']);
-
-                if (request('stat_type') == 'checkout')
-                    $Item_stat->purchasedCount += 1;
-                else
-                    $Item_stat->removedCount += 1;
-
-                $Item_stat = $Item_stat->toArray();
-                $Item_stat['created_at'] = $currentTime;
-                $Item_stat['updated_at'] = $currentTime;
-                Arr::forget($Item_stat, ['product']);
-
-                $item_stats[] = $Item_stat;
-            }
-
-            Item_stat::upsert($item_stats, ['id']);
-
             if (is_array($ids))
             {
-                $this->model->destroy($ids);
+                $this->model->withoutEvents(function () use ($ids) {
+                    $this->model->destroy($ids);
+                });
+                $this->model->fireEvent('deleted');
             }
-            DB::commit();
         } catch (\Exception $e) {
-                DB::rollback();
                 return response(['error' => $e.'Unauthorized'], 400);
             }
 
         return response([
-            'data' => $items,
+            'data' => $ids,
             'status' => 'success'
         ]);
-    }
-
-    /**
-     * @param $product_id
-     * @return mixed
-     */
-    public function firstOrNewAndCheckForNullValues($product_id)
-    {
-        $Item_stat = Item_stat::firstOrNew([
-            'product_id' => $product_id
-        ]);
-        if ($Item_stat->addedCount == null)
-            $Item_stat->addedCount = 0;
-        if ($Item_stat->purchasedCount == null)
-            $Item_stat->purchasedCount = 0;
-        if ($Item_stat->removedCount == null)
-            $Item_stat->removedCount = 0;
-
-        return $Item_stat;
     }
 }
