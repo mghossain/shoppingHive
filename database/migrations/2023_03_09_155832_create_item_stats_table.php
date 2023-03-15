@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('item_stats', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id');
-            $table->integer('addedCount');
-            $table->integer('removedCount');
-            $table->integer('purchasedCount');
+            $table->integer('addedCount')->default(0);
+            $table->integer('removedCount')->default(0);
+            $table->integer('purchasedCount')->default(0);
             $table->timestamps();
         });
     }
