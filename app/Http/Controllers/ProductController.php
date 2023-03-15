@@ -17,12 +17,9 @@ class ProductController extends Controller
     {
         $products = $this->productRepo->getAllProductsPaginated();
 
-        if ($products != null)
-            return response([
-                'data' => $products,
-                'status' => 'success'
-            ]);
-        else
-            return response(['error' => 'Unauthorized'], 400);
+        return response([
+            'data' => $products,
+            'status' => 'success'
+        ]);
     }
 }

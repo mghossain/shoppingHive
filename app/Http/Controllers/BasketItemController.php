@@ -18,13 +18,10 @@ class BasketItemController extends Controller
     {
         $basketItems = $this->basketItemRepo->getAllBasketItemsPaginated();
 
-        if ($basketItems != null)
-            return response([
-                'data' => $basketItems,
-                'status' => 'success'
-            ]);
-        else
-            return response(['error' => 'Unauthorized'], 400);
+        return response([
+            'data' => $basketItems,
+            'status' => 'success'
+        ]);
     }
     public function store()
     {
@@ -38,11 +35,7 @@ class BasketItemController extends Controller
             ]);
         }
 
-        try {
-            $basketItem = $this->basketItemRepo->createBasketItem($attributes);
-        } catch (\Exception $e) {
-            return response(['error' => 'Unauthorized'], 400);
-        }
+        $basketItem = $this->basketItemRepo->createBasketItem($attributes);
 
         return response([
             'data' => $basketItem,
@@ -55,14 +48,10 @@ class BasketItemController extends Controller
         $ids = request()->input('ids.*.id');
         $model = new Basket_item();
 
-        try {
-            $model->withoutEvents(function () use ($ids) {
-                $this->basketItemRepo->deleteBasketItems($ids);
-            });
-            $model->fireEvent('deleted');
-        } catch (\Exception $e) {
-                return response(['error' => $e.'Unauthorized'], 400);
-            }
+        $model->withoutEvents(function () use ($ids) {
+            $this->basketItemRepo->deleteBasketItems($ids);
+        });
+        $model->fireEvent('deleted');
 
         return response([
             'data' => $ids,
