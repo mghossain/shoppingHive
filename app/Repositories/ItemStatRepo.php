@@ -16,4 +16,12 @@ class ItemStatRepo
     {
         return $this->model->latest()->paginate();
     }
+
+    public function firstOrNewItem($product_id)
+    {
+        return $this->model
+            ->firstOrNew([
+                'product_id' => $product_id
+            ]);
+    }
 }

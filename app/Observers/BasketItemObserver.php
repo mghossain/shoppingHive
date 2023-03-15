@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Basket_item;
 use App\Models\Item_stat;
+use App\Repositories\ItemStatRepo;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
@@ -52,9 +53,10 @@ class BasketItemObserver
 
     public function firstOrNewAndCheckForNullValues($product_id)
     {
-        $Item_stat = Item_stat::firstOrNew([
-            'product_id' => $product_id
-        ]);
+        $itemStatRepo = new ItemStatRepo();
+            $Item_stat = $itemStatRepo->firstOrNewItem($product_id);
+
+
         if ($Item_stat->addedCount == null)
             $Item_stat->addedCount = 0;
         if ($Item_stat->purchasedCount == null)
