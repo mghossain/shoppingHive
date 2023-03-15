@@ -32,7 +32,6 @@ class BasketItemController extends Controller
            'product_id' => 'required'
         ]);
 
-
         if ($this->basketItemRepo->isItemInBasket($attributes['product_id'])) {
             return response([
                 'status' => 'exists'
@@ -55,7 +54,7 @@ class BasketItemController extends Controller
     {
         $ids = request()->input('ids.*.id');
         $model = new Basket_item();
-//        dd($ids);
+
         try {
             $model->withoutEvents(function () use ($ids) {
                 $this->basketItemRepo->deleteBasketItems($ids);
