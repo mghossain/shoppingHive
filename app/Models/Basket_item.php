@@ -15,8 +15,4 @@ class Basket_item extends Model
     {
         return $this->belongsTo('App\Models\Product');
     }
-    public function fireEvent($event)
-    {
-        $this->fireModelEvent($event);
-    }
 }

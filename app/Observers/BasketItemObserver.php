@@ -3,10 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Basket_item;
-use App\Models\Item_stat;
 use App\Repositories\ItemStatRepo;
-use Carbon\Carbon;
-use Illuminate\Support\Arr;
 
 class BasketItemObserver
 {
