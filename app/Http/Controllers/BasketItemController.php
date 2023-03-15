@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\BasketItemRepo;
-use App\Models\Basket_item;
+use App\Repositories\ItemStatRepo;
 
 class BasketItemController extends Controller
 {
@@ -26,14 +26,8 @@ class BasketItemController extends Controller
     public function store()
     {
         $attributes = request()->validate([
-           'product_id' => 'required'
+           'product_id' => 'required|exists:products,id|unique:basket_items,product_id'
         ]);
-
-        if ($this->basketItemRepo->isItemInBasket($attributes['product_id'])) {
-            return response([
-                'status' => 'exists'
-            ]);
-        }
 
         $basketItem = $this->basketItemRepo->createBasketItem($attributes);
 
@@ -45,13 +39,23 @@ class BasketItemController extends Controller
 
     public function destroy()
     {
-        $ids = request()->input('ids.*.id');
-        $model = new Basket_item();
+        $attributes = request()->validate([
+            'ids.*.product_id' => 'required|exists:products,id|exists:basket_items,product_id'
+        ]);
 
-        $model->withoutEvents(function () use ($ids) {
-            $this->basketItemRepo->deleteBasketItems($ids);
-        });
-        $model->fireEvent('deleted');
+        $ids = request()->input('ids.*.id');
+        $productIds = request()->input('ids.*.product_id');
+        $itemStatRepo = new ItemStatRepo();
+
+        $this->basketItemRepo->deleteBasketItems($ids);
+
+        foreach ($productIds as $product_id) {
+            $fieldName = 'removedCount';
+            if (request('stat_type') == 'checkout')
+                $fieldName = 'purchasedCount';
+
+            $itemStatRepo->incrementFieldCount($product_id, $fieldName);
+        }
 
         return response([
             'data' => $ids,

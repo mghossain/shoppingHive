@@ -17,11 +17,12 @@ class ItemStatRepo
         return $this->model->latest()->paginate();
     }
 
-    public function firstOrNewItem($product_id)
+    public function incrementFieldCount(mixed $product_id, mixed $fieldName)
     {
-        return $this->model
-            ->firstOrNew([
+        $this->model
+            ->updateOrCreate([
                 'product_id' => $product_id
-            ]);
+            ])
+            ->increment($fieldName);
     }
 }
